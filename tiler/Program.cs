@@ -14,7 +14,7 @@ WebpEncoder GetWebpEncoder() => new WebpEncoder
 {
     Quality = 100,
     // NearLosslessQuality = 100,
-    // FileFormat = WebpFileFormatType.Lossless,
+    FileFormat = WebpFileFormatType.Lossless,
     // NearLossless = true,
 };
 
