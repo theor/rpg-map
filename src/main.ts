@@ -38,7 +38,7 @@ let Position = L.Control.extend({
         position: 'bottomleft'
     },
 
-    onAdd: function (map: Map) {
+    onAdd: function (_map: Map) {
         var latlng = L.DomUtil.create('div', 'mouseposition');
         this._latlng = latlng;
         return latlng;
@@ -71,16 +71,17 @@ interface PosMsg {
     latlng: L.LatLngLiteral,
     zoom: number,
 }
-await channel.subscribe("pos", m => {
+channel.subscribe("pos", m => {
     console.log(m);
     const data = m.data as PosMsg;
     mouseMarker.setLatLng(data.latlng);
     map.flyTo(data.latlng, data.zoom);
-});
+}).then(() => {
 
-map.addEventListener("click", async _ => {
-    console.log(position._latlng?.innerText);
-    let m: PosMsg = { latlng: position.latlng, zoom: map.getZoom() };
-    await channel.publish("pos", m);
-    // mouseMarker.setLatLng(position.latlng);
-})
+    map.addEventListener("click", async _ => {
+        console.log(position._latlng?.innerText);
+        let m: PosMsg = { latlng: position.latlng, zoom: map.getZoom() };
+        await channel.publish("pos", m);
+        // mouseMarker.setLatLng(position.latlng);
+    });
+});
