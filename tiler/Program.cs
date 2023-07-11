@@ -32,22 +32,17 @@ void CreateReferenceLevel(int startLevel)
         int y = i / Cols;
         Console.WriteLine($"{x},{y} {i} {Path.GetFileNameWithoutExtension(file)}");
         var outFilePath = Path.Combine(levelOutDir, $"{x}{y}.png");
-        File.Delete(outFilePath);
+        var image = Image.Load(file);
+        image.Mutate(i =>
         {
+            i.Resize(new ResizeOptions
             {
-                var image = Image.Load(file);
-                image.Mutate(i =>
-                {
-                    i.Resize(new ResizeOptions
-                    {
-                        Sampler = bicubicResampler,
-                        Size = new Size(256, 256),  
-                        Mode = ResizeMode.Stretch,
-                    });
-                });
-                image.Save(outFilePath);
-            }
-        }
+                Sampler = bicubicResampler,
+                Size = new Size(256, 256),
+                Mode = ResizeMode.Stretch,
+            });
+        });
+        image.Save(outFilePath);
 
         // File.Copy(file, outFilePath);
     }
