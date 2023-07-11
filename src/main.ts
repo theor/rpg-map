@@ -51,7 +51,13 @@ let Position = L.Control.extend({
         this._latlng!.innerHTML = latlng;
     }
 });
+
+
 let mouseMarker = L.marker([-59, 156.11]).addTo(map);
+mouseMarker.on("contextmenu", _ => {
+    mouseMarker.remove()
+});
+
 let position = new Position();
 map.addControl(position);
 map.addEventListener('mousemove', (event) => {
@@ -78,6 +84,7 @@ interface PosMsg {
 await channel.subscribe("pos", m => {
     console.log(m);
     const data = m.data as PosMsg;
+    mouseMarker.addTo(map);
     mouseMarker.setLatLng(data.latlng);
     map.flyTo(data.latlng, data.zoom);
 });
