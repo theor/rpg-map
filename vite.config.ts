@@ -1,3 +1,4 @@
 export default {
-  base: '/rpg-map/'
+  target: 'esnext',
+  base: '/rpg-map/',
 }

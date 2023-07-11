@@ -60,10 +60,14 @@ map.addEventListener('mousemove', (event) => {
     position.updateHTML(lat, lng);
 }
 );
+const urlParams = new URLSearchParams(window.location.search);
+const key = urlParams.get('key');
+console.log(key)
 
-const ably = new Ably.Realtime.Promise('0gg2PA.DEHU8g:gtZosWb1pwVfrQu11xPZnjX_BwPwQsKFSOJwLyJ7H0M');
+const ably = new Ably.Realtime.Promise('0gg2PA.DEHU8g:' + key);
 await ably.connection.once('connected');
 console.log('Connected to Ably!');
+
 
 const channel = ably.channels.get('getting-started');
 
@@ -71,17 +75,17 @@ interface PosMsg {
     latlng: L.LatLngLiteral,
     zoom: number,
 }
-channel.subscribe("pos", m => {
+await channel.subscribe("pos", m => {
     console.log(m);
     const data = m.data as PosMsg;
     mouseMarker.setLatLng(data.latlng);
     map.flyTo(data.latlng, data.zoom);
-}).then(() => {
+});
 
-    map.addEventListener("click", async _ => {
-        console.log(position._latlng?.innerText);
-        let m: PosMsg = { latlng: position.latlng, zoom: map.getZoom() };
-        await channel.publish("pos", m);
-        // mouseMarker.setLatLng(position.latlng);
-    });
+
+map.addEventListener("click", async _ => {
+    console.log(position._latlng?.innerText);
+    let m: PosMsg = { latlng: position.latlng, zoom: map.getZoom() };
+    await channel.publish("pos", m);
+    // mouseMarker.setLatLng(position.latlng);
 });
