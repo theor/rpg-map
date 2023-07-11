@@ -2,6 +2,7 @@
 
 using System.Text.RegularExpressions;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Processing.Processors.Transforms;
 
@@ -9,6 +10,13 @@ using SixLabors.ImageSharp.Processing.Processors.Transforms;
 string path = System.IO.Path.GetFullPath("../../../../map");
 Console.WriteLine(path);
 string outpath = System.IO.Path.GetFullPath("../../../../public");
+WebpEncoder GetWebpEncoder() => new WebpEncoder
+{
+    Quality = 100,
+    // NearLosslessQuality = 100,
+    // FileFormat = WebpFileFormatType.Lossless,
+    // NearLossless = true,
+};
 
 IEnumerable<(string file, int x, int y)> ListTiles(int levelCols)
 {
@@ -33,6 +41,7 @@ void CreateReferenceLevel(int startLevel, int levelCols, int levelRows)
     Directory.CreateDirectory(levelOutDir);
 
     var bicubicResampler = new BicubicResampler();
+    var webpEncoder = GetWebpEncoder();
 
     foreach (var (file, x, y) in ListTiles(levelCols))
     {
@@ -48,7 +57,8 @@ void CreateReferenceLevel(int startLevel, int levelCols, int levelRows)
                 Mode = ResizeMode.Stretch,
             });
         });
-        image.Save(outFilePath);
+        image.SaveAsPng(Path.ChangeExtension(outFilePath, "png"));
+        image.SaveAsWebpAsync(outFilePath, webpEncoder);
 
         // File.Copy(file, outFilePath);
     }
@@ -60,6 +70,7 @@ void CreatePrevLevel(int level, int levelCols, int levelRows)
     int newLevel = level - 1;
     string levelOutDir = Path.Combine(outpath, newLevel.ToString());
     Directory.CreateDirectory(levelOutDir);
+    var webpEncoder = GetWebpEncoder();
     for (int i = 0; i < levelCols / 2; i++)
     {
         for (int j = 0; j < levelRows / 2; j++)
@@ -72,13 +83,15 @@ void CreatePrevLevel(int level, int levelCols, int levelRows)
                 {
                     int dx = k % 2;
                     int dy = k / 2;
-                    var src = Image.Load(Path.Combine(outpath, level.ToString(), $"{(i * 2 + dx)}.{j * 2 + dy}.webp"));
+                    var src = Image.Load(Path.Combine(outpath, level.ToString(), $"{(i * 2 + dx)}.{j * 2 + dy}.png"));
                     src.Mutate(s => s.Resize(new Size(128, 128)));
                     img.DrawImage(src, new Point(128 * dx, 128 * dy), 1);
 
                 }
             });
-            img.Save(outFilePath);
+            
+            img.SaveAsPng(Path.ChangeExtension(outFilePath, "png"));
+            img.SaveAsWebpAsync(outFilePath, webpEncoder);
         }
     }
 }
@@ -105,6 +118,7 @@ void Split(int startLevel, int levelCols, int levelRows, int countPerTile)
 
     var bicubicResampler = new BicubicResampler();
 
+    var webpEncoder = GetWebpEncoder();
     foreach (var (file, x, y) in ListTiles(levelCols))
     {
         var image = Image.Load(file);
@@ -121,7 +135,7 @@ void Split(int startLevel, int levelCols, int levelRows, int countPerTile)
                 Console.WriteLine($"    {xx} {yy}");
                 var i1 = i;
                 var j1 = j;
-                image.Clone(img =>
+                var clone = image.Clone(img =>
                 {
                     img.Crop(new Rectangle(i1 * sourceSize, j1 * sourceSize, sourceSize, sourceSize))
                         .Resize(new ResizeOptions
@@ -130,7 +144,8 @@ void Split(int startLevel, int levelCols, int levelRows, int countPerTile)
                             Size = new Size(256, 256),
                             Mode = ResizeMode.Stretch,
                         });
-                }).Save(outFilePath);
+                });
+                clone.SaveAsWebpAsync(outFilePath, webpEncoder);
 
             }
         }
