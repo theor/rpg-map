@@ -24,4 +24,4 @@ dist-ssr
 
 tiler/bin/
 tiler/obj/
-public/**/*.png
+public/*/**/*.png
