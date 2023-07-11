@@ -4,7 +4,6 @@ import L from 'leaflet';
 
 L.Icon.Default.imagePath = 'img/icon/';
 
-const F = 2;
 const map = L.map('map', {
     // center: [20,20],
     crs: L.CRS.Simple,
