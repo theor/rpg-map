@@ -4,18 +4,22 @@ import L from 'leaflet';
 
 L.Icon.Default.imagePath = 'img/icon/';
 
+const bounds = L.latLngBounds(L.latLng(-2*64, 0), L.latLng(0, 256));
 const map = L.map('map', {
     // center: [20,20],
     crs: L.CRS.Simple,
     // minZoom: -5,
     // layers: [m_mono],
-}).setView([-64.0, 128.0], 2)
-// .setMaxBounds(L.latLngBounds(L.latLng(-164*F, -128*F), L.latLng(164*F, 128*F)));;
+})
+// .setMaxBounds()
+.setView([-64.0, 128.0], 3);;
 L.tileLayer('{z}/{x}.{y}.webp', {
+    errorTileUrl: "error.webp",
     maxNativeZoom:7,
     minZoom: 1,
     maxZoom: 8,
     noWrap: true,
+    bounds: bounds,
 
 }).addTo(map);
 console.log(map.getBounds())
