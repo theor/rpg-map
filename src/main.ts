@@ -11,7 +11,7 @@ const map = L.map('map', {
     // layers: [m_mono],
 }).setView([0.0, 0.0], 4)
 //.setMaxBounds(L.latLngBounds(L.latLng(0, 0), L.latLng(1000, 100)));;
-const m_mono = L.tileLayer('{z}/{x}{y}.png', {
+L.tileLayer('{z}/{x}{y}.png', {
     maxNativeZoom:4,
     minZoom: 1,
     maxZoom: 8,
