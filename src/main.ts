@@ -2,7 +2,7 @@ import './style.css'
 import 'leaflet/dist/leaflet.css';
 import L, { Map } from 'leaflet';
 import * as Ably from 'ably';
-L.Icon.Default.imagePath = '/';
+L.Icon.Default.imagePath = '/rpg-map/';
 
 const bounds = L.latLngBounds(L.latLng(-2 * 64, 0), L.latLng(0, 256));
 const map = L.map('map', {
